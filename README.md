@@ -8,4 +8,3 @@ Este proyecto es una aplicación web que permite gestionar una lista de superhé
 - **Leer**: Muestra la lista de superhéroes registrados en el sistema con detalles como nombre real, alias y foto.
 - **Actualizar**: Permite editar la información de un superhéroe ya existente.
 - **Eliminar**: Permite eliminar a un superhéroe de la base de datos.
-- 
