@@ -21,5 +21,4 @@ Este proyecto es una aplicación web que permite gestionar una lista de superhé
 ### Restauración de Registros Eliminados
 - Se ha agregado una nueva vista que permite ver los registros eliminados lógicamente y restaurarlos.
 
-## Capturas de Pantalla
-- Adjunta capturas de pantalla de las vistas actualizadas, la base de datos y los formularios de restauración de registros eliminados.
+
