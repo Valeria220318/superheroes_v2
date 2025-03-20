@@ -8,3 +8,18 @@ Este proyecto es una aplicación web que permite gestionar una lista de superhé
 - **Leer**: Muestra la lista de superhéroes registrados en el sistema con detalles como nombre real, alias y foto.
 - **Actualizar**: Permite editar la información de un superhéroe ya existente.
 - **Eliminar**: Permite eliminar a un superhéroe de la base de datos.
+
+## Nuevas Características
+
+### Gestión de Fotos Locales
+- Las fotos de los superhéroes ahora se almacenan de forma local en el directorio `storage/heroes_photos/` en lugar de usar URLs externas.
+
+### Eliminación Lógica
+- Los superhéroes ya no se eliminan físicamente de la base de datos. En su lugar, se utiliza una eliminación lógica donde el campo `activo` de la base de datos se establece en `false` para indicar que el registro ha sido "eliminado".
+- Solo los registros con `activo = true` se muestran en la vista de índice.
+
+### Restauración de Registros Eliminados
+- Se ha agregado una nueva vista que permite ver los registros eliminados lógicamente y restaurarlos.
+
+## Capturas de Pantalla
+- Adjunta capturas de pantalla de las vistas actualizadas, la base de datos y los formularios de restauración de registros eliminados.
