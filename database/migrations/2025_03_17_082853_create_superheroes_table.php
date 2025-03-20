@@ -13,6 +13,8 @@ return new class extends Migration {
             $table->string('alias');
             $table->string('foto')->nullable(); 
             $table->text('informacion')->nullable();
+            $table->boolean('activo')->default(true); // Campo para controlar el estado (activo/inactivo)
+            $table->softDeletes(); // Agrega el campo deleted_at para el borrado lógico
             $table->timestamps();
         });
     }
@@ -22,4 +24,5 @@ return new class extends Migration {
         Schema::dropIfExists('superheroes');
     }
 };
+
 
