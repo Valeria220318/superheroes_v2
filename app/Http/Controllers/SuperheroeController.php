@@ -4,15 +4,20 @@ namespace App\Http\Controllers;
 
 use App\Models\Superheroe;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Storage;
 
 class SuperheroeController extends Controller
 {
-    // Mostrar todos los superhéroes
+    // Mostrar lista de superhéroes activos
     public function index()
     {
-        $superheroes = Superheroe::all();
+        $superheroes = Superheroe::where('activo', true)->get();
         return view('superheroes.index', compact('superheroes'));
+    }
+
+    // Mostrar un superhéroe en detalle
+    public function show(Superheroe $superheroe)
+    {
+        return view('superheroes.show', compact('superheroe'));
     }
 
     // Formulario para crear un nuevo superhéroe
@@ -21,41 +26,19 @@ class SuperheroeController extends Controller
         return view('superheroes.create');
     }
 
-    // Guardar un nuevo superhéroe
+    // Almacenar un nuevo superhéroe
     public function store(Request $request)
     {
         $request->validate([
             'nombre_real' => 'required|string|max:255',
             'alias' => 'required|string|max:255',
-            'foto_file' => 'nullable|image|max:2048', // Imagen opcional (máx 2MB)
-            'foto_url' => 'nullable|url',             // URL opcional
+            'foto' => 'nullable|string',
             'informacion' => 'nullable|string',
         ]);
 
-        // Manejar la imagen (archivo o URL)
-        $fotoPath = null;
+        Superheroe::create($request->all());
 
-        if ($request->hasFile('foto_file')) {
-            $fotoPath = $request->file('foto_file')->store('superheroes', 'public');
-        } elseif ($request->foto_url) {
-            $fotoPath = $request->foto_url;
-        }
-
-        Superheroe::create([
-            'nombre_real' => $request->nombre_real,
-            'alias' => $request->alias,
-            'foto' => $fotoPath,
-            'informacion' => $request->informacion,
-        ]);
-
-        return redirect()->route('superheroes.index')
-                         ->with('success', '¡Superhéroe creado exitosamente!');
-    }
-
-    // Mostrar un superhéroe específico
-    public function show(Superheroe $superheroe)
-    {
-        return view('superheroes.show', compact('superheroe'));
+        return redirect()->route('superheroes.index')->with('success', '¡Superhéroe creado con éxito!');
     }
 
     // Formulario para editar un superhéroe
@@ -70,49 +53,46 @@ class SuperheroeController extends Controller
         $request->validate([
             'nombre_real' => 'required|string|max:255',
             'alias' => 'required|string|max:255',
-            'foto_file' => 'nullable|image|max:2048',
-            'foto_url' => 'nullable|url',
+            'foto' => 'nullable|string',
             'informacion' => 'nullable|string',
+            'activo' => 'boolean',
         ]);
 
-        // Manejar la imagen (archivo o URL)
-        $fotoPath = $superheroe->foto;
+        $superheroe->update($request->all());
 
-        if ($request->hasFile('foto_file')) {
-            // Eliminar la imagen anterior si existe y no es una URL
-            if ($fotoPath && !filter_var($fotoPath, FILTER_VALIDATE_URL)) {
-                Storage::delete('public/' . $fotoPath);
-            }
-
-            // Guardar la nueva imagen
-            $fotoPath = $request->file('foto_file')->store('superheroes', 'public');
-        } elseif ($request->foto_url) {
-            // Si se proporciona una URL, usarla
-            $fotoPath = $request->foto_url;
-        }
-
-        $superheroe->update([
-            'nombre_real' => $request->nombre_real,
-            'alias' => $request->alias,
-            'foto' => $fotoPath,
-            'informacion' => $request->informacion,
-        ]);
-
-        return redirect()->route('superheroes.index')
-                         ->with('success', '¡Superhéroe actualizado!');
+        return redirect()->route('superheroes.index')->with('success', '¡Superhéroe actualizado con éxito!');
     }
 
-    // Eliminar un superhéroe
+    // Eliminar lógicamente un superhéroe
     public function destroy(Superheroe $superheroe)
     {
-        // Eliminar la imagen almacenada si existe y no es una URL
-        if ($superheroe->foto && !filter_var($superheroe->foto, FILTER_VALIDATE_URL)) {
-            Storage::delete('public/' . $superheroe->foto);
-        }
-
         $superheroe->delete();
 
-        return redirect()->route('superheroes.index')
-                         ->with('success', '¡Superhéroe eliminado!');
+        return redirect()->route('superheroes.index')->with('success', '¡Superhéroe eliminado lógicamente!');
+    }
+
+    // Mostrar superhéroes inactivos (eliminados lógicamente)
+    public function inactivos()
+    {
+        $superheroes = Superheroe::onlyTrashed()->get();
+        return view('superheroes.inactivos', compact('superheroes'));
+    }
+
+    // Restaurar un superhéroe eliminado
+    public function restore($id)
+    {
+        $superheroe = Superheroe::withTrashed()->findOrFail($id);
+        $superheroe->restore();
+
+        return redirect()->route('superheroes.index')->with('success', '¡Superhéroe restaurado con éxito!');
+    }
+
+    // Eliminar permanentemente un superhéroe
+    public function forceDelete($id)
+    {
+        $superheroe = Superheroe::withTrashed()->findOrFail($id);
+        $superheroe->forceDelete();
+
+        return redirect()->route('superheroes.inactivos')->with('success', '¡Superhéroe eliminado permanentemente!');
     }
 }
